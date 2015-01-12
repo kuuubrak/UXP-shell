@@ -1,18 +1,15 @@
-CC = gcc  
+CC = gcc
+CFLAGS = -Wall
+SOURCES = $(wildcard src/*.c) $(wildcard src/commands/*.c)
+OBJECTS = $(SOURCES:.c=.o)
+EXEC = uxp-shell
 
-all: clean main.o parser.o cd.o mkdir.o
-	$(CC) main.o parser.o cd.o mkdir.o -o uxp-shell
-main.o: main.c
-	$(CC) main.c -c -o main.o
+$(EXEC) : $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(EXEC)
 
-parser.o: parser.c
-	$(CC) parser.c -c -o parser.o
-
-cd.o: commands/cd.c
-	$(CC) commands/cd.c -c -o cd.o
-
-mkdir.o: commands/mkdir.c
-	$(CC) commands/mkdir.c -c -o mkdir.o
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o uxp-shell
+	find . -type f -name '*.o' -exec rm {} +
+	rm -f uxp-shell

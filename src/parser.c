@@ -10,5 +10,5 @@
 
 
 void parseCommand(char *command) {
-  
+
 }
