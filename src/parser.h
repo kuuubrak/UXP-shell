@@ -11,6 +11,16 @@
 
 #include <stdio.h>
 
-void parseCommand(char *command);
+#define MAX_ARGS 10
+
+enum commands
+{
+  COMMAND_NONE      = 0,
+  COMMAND_EXIT      = 1,
+  COMMAND_MKDIR     = 2,
+  COMMAND_CD        = 3
+};
+
+int parseCommand(char *command, char* args[], int* numargs);
 
 #endif /* defined(__UXP_Shell__parser__) */

@@ -1,10 +1,14 @@
 #include "main.h"
 #include "parser.h"
+#include "commands/mkdir.h"
+#include "commands/cd.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 #include <pwd.h>
-#include <stdlib.h>
+#include <stdlib.h>\
+
+#define MAX_LINE_SIZE 100
 
 char *currentDirectory;
 char *username;
@@ -31,21 +35,36 @@ void intialize() {
  * Shows prompt and waits for a command to be entered. (Probably can be implemented in a better way :) )
  */
 void showPrompt() {
-  char commandBuffer[96];
   printf("%s@%s$ ", username, currentDirectory);
-  scanf("%s", commandBuffer);
-  interpretCommand(commandBuffer);
+  char commandBuffer[MAX_LINE_SIZE];
+  int size = MAX_LINE_SIZE;
+  if (fgets(commandBuffer, size, stdin) != NULL)
+    interpretCommand(commandBuffer);
 }
 
 /**
  * Interprets entered command, sends it to parser
  */
 void interpretCommand(char *command) {
-  if (strcmp(command, "exit") == 0) {
-    exit(0);
-  } else {
-    showPrompt();
+  char* args[MAX_ARGS];
+  int numargs;
+  int commandType = parseCommand(command, args, &numargs);
+
+  switch (commandType)
+  {
+    case COMMAND_EXIT:
+      exit(0);
+      break;
+    case COMMAND_MKDIR:
+      handleCommandMkdir(args, numargs);
+      break;
+    case COMMAND_CD:
+      handleCommandCd(args, numargs);
+      break;
+    default:
+      break;
   }
+  showPrompt();
 }
 
 /**
@@ -53,9 +72,6 @@ void interpretCommand(char *command) {
  */
 char* getCurrentDirectory() {
   char *directoryBuffer = malloc(128);
-  if (getcwd(directoryBuffer, 128) != NULL) {
-    return directoryBuffer;
-  } else {
-    return 0;
-  }
+  getcwd(directoryBuffer, 128);
+  return directoryBuffer;
 }

@@ -11,6 +11,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+void handleCommandMkdir(char* args[], int numargs) {
+
+}
+
 void makeDirectory(char *directoryName) {
   struct stat st = {0};
   if (stat(directoryName, &st) == -1) {

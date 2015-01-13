@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+void handleCommandCd(char* args[], int numargs);
 void changeDirectory(char *path);
 
 #endif /* defined(__UXP_Shell__cd__) */

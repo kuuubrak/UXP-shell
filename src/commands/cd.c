@@ -10,6 +10,10 @@
 #include "string.h"
 #include "pwd.h"
 
+void handleCommandCd(char* args[], int numargs) {
+
+}
+
 void changeDirectory(char *path) {
   if (strcmp(path, "") == 0) {
     struct passwd *account = getpwuid(getuid());

@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+void handleCommandMkdir(char* args[], int numargs);
 void makeDirectory(char *directoryName);
 
 #endif /* defined(__UXP_Shell__mkdir__) */
