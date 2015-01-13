@@ -10,23 +10,30 @@
 #include <string.h>
 
 /**
-Parse command, save arguments in args and number of arguments in numargs. Returns command code from enum Commands
+Parse command, save type in type, arguments in args and number of arguments in argsNum. Returns list of commands.
 */
-int parseCommand(char *command, char* args[], int* numargs) {
-  *numargs = 0;
-  int result = COMMAND_NONE;
+listElement* parseCommand(char *command) {
+  int argsNum = 0;
+  char* args[MAX_ARGS];
+  listElement* result;
+  int type = COMMAND_NONE;
 
   command = strtok(command, " ");
   if (strcmp(command, "exit") == 0)
-    result = COMMAND_EXIT;
+    type = COMMAND_EXIT;
   else if (strcmp(command, "mkdir") == 0)
-    result = COMMAND_MKDIR;
+    type = COMMAND_MKDIR;
   else if (strcmp(command, "cd") == 0)
-    result = COMMAND_CD;
+    type = COMMAND_CD;
 
   char* token;
-  while ((token = strtok(NULL, " ")))
-    args[(*numargs)++] = token;
+  while ((token = strtok(NULL, " ")) && strcmp(token, "|") != 0)
+    args[(argsNum)++] = token;
 
+  Command* comm = (Command*) malloc(sizeof(Command));
+  comm->type = type;
+  comm->args = args;
+  comm->argsNum = argsNum;
+  result = initList(comm);
   return result;
 }

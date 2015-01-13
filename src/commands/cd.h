@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include "../sharedDefines.h"
 
 void handleCommandCd(char* args[], int numargs);
 void changeDirectory(char *path);

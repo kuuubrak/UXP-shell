@@ -10,17 +10,9 @@
 #define __UXP_Shell__parser__
 
 #include <stdio.h>
+#include "list.h"
+#include "sharedDefines.h"
 
-#define MAX_ARGS 10
-
-enum commands
-{
-  COMMAND_NONE      = 0,
-  COMMAND_EXIT      = 1,
-  COMMAND_MKDIR     = 2,
-  COMMAND_CD        = 3
-};
-
-int parseCommand(char *command, char* args[], int* numargs);
+listElement* parseCommand(char *command);
 
 #endif /* defined(__UXP_Shell__parser__) */

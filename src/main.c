@@ -7,8 +7,8 @@
 #include <string.h>
 #include <pwd.h>
 #include <stdlib.h>
-
-#define MAX_LINE_SIZE 100
+#include "list.h"
+#include "sharedDefines.h"
 
 char *currentDirectory;
 char *username;
@@ -46,23 +46,28 @@ void showPrompt() {
  * Interprets entered command, sends it to parser
  */
 void interpretCommand(char *command) {
-  char* args[MAX_ARGS];
-  int numargs;
-  int commandType = parseCommand(command, args, &numargs);
+  listElement* commandsList = parseCommand(command);
 
-  switch (commandType)
+  while (commandsList != NULL)
   {
-    case COMMAND_EXIT:
-      exit(0);
-      break;
-    case COMMAND_MKDIR:
-      handleCommandMkdir(args, numargs);
-      break;
-    case COMMAND_CD:
-      handleCommandCd(args, numargs);
-      break;
-    default:
-      break;
+    Command* current = commandsList->command;
+    switch (current->type)
+    {
+      case COMMAND_EXIT:
+        exit(0);
+        break;
+      case COMMAND_MKDIR:
+        handleCommandMkdir(current->args, current->argsNum);
+        break;
+      case COMMAND_CD:
+        handleCommandCd(current->args, current->argsNum);
+        break;
+      default:
+        break;
+    }
+    listElement* temp = commandsList;
+    commandsList = commandsList->next;
+    free(temp);
   }
   showPrompt();
 }

@@ -10,6 +10,7 @@
 #define __UXP_Shell__mkdir__
 
 #include <stdio.h>
+#include "../sharedDefines.h"
 
 void handleCommandMkdir(char* args[], int numargs);
 void makeDirectory(char *directoryName);

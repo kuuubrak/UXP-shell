@@ -25,4 +25,3 @@ void makeDirectory(char *directoryName) {
     fprintf(stderr, "Directory already exists\n");
   }
 }
-
