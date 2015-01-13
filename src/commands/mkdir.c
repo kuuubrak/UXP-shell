@@ -13,9 +13,24 @@
 
 void handleCommandMkdir(char* args[], int numargs)
 {
-
+  if (numargs == 0)
+  {
+    fprintf(stderr, "usage: mkdir directory_name\n");
+  }
+  else
+  {
+    int i;
+    //Shell allows you to enter multiple directories separated by spaces
+    for (i = 0; i < numargs; i++)
+    {
+      makeDirectory(args[i]);
+    }
+  }
 }
 
+/**
+ * Creates a directory at given path
+ */
 void makeDirectory(char *directoryName)
 {
   struct stat st = {0};
@@ -25,5 +40,5 @@ void makeDirectory(char *directoryName)
       fprintf(stderr, "Couldn't create directory\n");
   }
   else
-    fprintf(stderr, "Directory already exists\n");
+    fprintf(stderr, "Directory %s already exists\n", directoryName);
 }

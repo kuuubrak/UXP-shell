@@ -10,7 +10,11 @@ typedef enum CommandType
   COMMAND_EXIT      = 1,
   COMMAND_MKDIR     = 2,
   COMMAND_CD        = 3,
-  COMMAND_MAX_ENUM  = 4
+  COMMAND_PWD       = 4,
+  COMMAND_TOUCH     = 5,
+  COMMAND_KILL      = 6,
+  COMMAND_RM        = 7,
+  COMMAND_MAX_ENUM  = 8
 } CommandType;
 
 typedef struct Command
