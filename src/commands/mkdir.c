@@ -11,17 +11,19 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void handleCommandMkdir(char* args[], int numargs) {
+void handleCommandMkdir(char* args[], int numargs)
+{
 
 }
 
-void makeDirectory(char *directoryName) {
+void makeDirectory(char *directoryName)
+{
   struct stat st = {0};
-  if (stat(directoryName, &st) == -1) {
-    if (mkdir(directoryName, 0700) != 0) {
+  if (stat(directoryName, &st) == -1)
+  {
+    if (mkdir(directoryName, 0700) != 0)
       fprintf(stderr, "Couldn't create directory\n");
-    }
-  } else {
-    fprintf(stderr, "Directory already exists\n");
   }
+  else
+    fprintf(stderr, "Directory already exists\n");
 }

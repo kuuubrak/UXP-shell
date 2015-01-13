@@ -9,7 +9,8 @@ typedef enum CommandType
   COMMAND_NONE      = 0,
   COMMAND_EXIT      = 1,
   COMMAND_MKDIR     = 2,
-  COMMAND_CD        = 3
+  COMMAND_CD        = 3,
+  COMMAND_MAX_ENUM  = 4
 } CommandType;
 
 typedef struct Command
@@ -17,6 +18,7 @@ typedef struct Command
   CommandType type;
   char** args;
   int argsNum;
+  char* stringCommand;
 } Command;
 
 #endif /* defined(__UXP_Shell__sharedDefines__) */

@@ -13,7 +13,8 @@
 char *currentDirectory;
 char *username;
 
-int main () {
+int main ()
+{
   intialize();
   showPrompt();
   return 0;
@@ -22,35 +23,43 @@ int main () {
 /**
  * Intialize required variables
  */
-void intialize() {
+void intialize()
+{
   currentDirectory = getCurrentDirectory();
   register struct passwd *account;
   account = getpwuid(getuid());
-  if (account) {
+  if (account)
     username = account->pw_name;
-  }
 }
 
 /**
  * Shows prompt and waits for a command to be entered. (Probably can be implemented in a better way :) )
  */
-void showPrompt() {
+void showPrompt()
+{
   printf("%s@%s$ ", username, currentDirectory);
   char commandBuffer[MAX_LINE_SIZE];
   int size = MAX_LINE_SIZE;
   if (fgets(commandBuffer, size, stdin) != NULL)
+  {
+    size_t len = strlen(commandBuffer) - 1;
+    if (commandBuffer[len] == '\n')
+      commandBuffer[len] = '\0'; // remove trailing newline character
     interpretCommand(commandBuffer);
+  }
 }
 
 /**
  * Interprets entered command, sends it to parser
  */
-void interpretCommand(char *command) {
+void interpretCommand(char *command)
+{
   listElement* commandsList = parseCommand(command);
 
+  Command* current;
   while (commandsList != NULL)
   {
-    Command* current = commandsList->command;
+    current = commandsList->command;
     switch (current->type)
     {
       case COMMAND_EXIT:
@@ -63,10 +72,13 @@ void interpretCommand(char *command) {
         handleCommandCd(current->args, current->argsNum);
         break;
       default:
+        fprintf(stderr, "Unknown command: %s\n", current->stringCommand);
         break;
     }
     listElement* temp = commandsList;
     commandsList = commandsList->next;
+    free(current->stringCommand);
+    free(current);
     free(temp);
   }
   showPrompt();
@@ -75,7 +87,8 @@ void interpretCommand(char *command) {
 /**
  * Gets application directory
  */
-char* getCurrentDirectory() {
+char* getCurrentDirectory()
+{
   char *directoryBuffer = malloc(128);
   getcwd(directoryBuffer, 128);
   return directoryBuffer;

@@ -14,14 +14,15 @@ void handleCommandCd(char* args[], int numargs) {
 
 }
 
-void changeDirectory(char *path) {
-  if (strcmp(path, "") == 0) {
+void changeDirectory(char *path)
+{
+  if (strcmp(path, "") == 0)
+  {
     struct passwd *account = getpwuid(getuid());
     const char *home = account->pw_dir;
-    if (chdir(home) != 0) {
+    if (chdir(home) != 0)
       fprintf(stderr, "Couldn't change directory");
-    }
-  } else if (chdir(path) != 0) {
-    fprintf(stderr, "Directory %s doesn't exist\n", path);
   }
+  else if (chdir(path) != 0)
+    fprintf(stderr, "Directory %s doesn't exist\n", path);
 }
