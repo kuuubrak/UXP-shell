@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pwd.h>
-#include <stdlib.h>\
+#include <stdlib.h>
 
 #define MAX_LINE_SIZE 100
 
