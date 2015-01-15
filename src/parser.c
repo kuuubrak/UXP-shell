@@ -27,6 +27,16 @@ listElement* parseCommand(char *command)
     type = COMMAND_MKDIR;
   else if (strcmp(strCommand, "cd") == 0)
     type = COMMAND_CD;
+  else if (strcmp(strCommand, "pwd") == 0)
+    type = COMMAND_PWD;
+  else if (strcmp(strCommand, "touch") == 0)
+    type = COMMAND_TOUCH;
+  else if (strcmp(strCommand, "kill") == 0)
+    type = COMMAND_KILL;
+  else if (strcmp(strCommand, "rm") == 0)
+    type = COMMAND_RM;
+  else if (strcmp(strCommand, "ls") == 0)
+    type = COMMAND_LS;
 
   char* token;
   while ((token = strtok(NULL, " ")) && strcmp(token, "|") != 0)

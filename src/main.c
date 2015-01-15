@@ -2,6 +2,11 @@
 #include "parser.h"
 #include "commands/mkdir.h"
 #include "commands/cd.h"
+#include "commands/pwd.h"
+#include "commands/touch.h"
+#include "commands/kill.h"
+#include "commands/rm.h"
+#include "commands/ls.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -70,6 +75,21 @@ void interpretCommand(char *command)
         break;
       case COMMAND_CD:
         handleCommandCd(current->args, current->argsNum);
+        break;
+      case COMMAND_PWD:
+        handleCommandPwd(current->args, current->argsNum);
+        break;
+      case COMMAND_TOUCH:
+        handleCommandTouch(current->args, current->argsNum);
+        break;
+      case COMMAND_KILL:
+        handleCommandKill(current->args, current->argsNum);
+        break;
+      case COMMAND_RM:
+        handleCommandRm(current->args, current->argsNum);
+        break;
+      case COMMAND_LS:
+        handleCommandLs(current->args, current->argsNum);
         break;
       default:
         fprintf(stderr, "Unknown command: %s\n", current->stringCommand);
