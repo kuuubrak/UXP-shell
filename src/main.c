@@ -15,6 +15,7 @@
 #include "list.h"
 #include "sharedDefines.h"
 #include "commands.h"
+#include <linux/limits.h>
 
 char *currentDirectory;
 char *username;
@@ -133,7 +134,7 @@ void interpretCommand(char *command)
  */
 char* getCurrentDirectory()
 {
-  char *directoryBuffer = (char*) malloc(256);
-  getcwd(directoryBuffer, 256);
+  char *directoryBuffer = (char*) malloc(PATH_MAX+1);
+  getcwd(directoryBuffer, PATH_MAX+1);
   return directoryBuffer;
 }
