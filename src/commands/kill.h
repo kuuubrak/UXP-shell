@@ -10,8 +10,9 @@
 #define __UXP_Shell__kill__
 
 #include <stdio.h>
+#include <sys/types.h>
 
 void handleCommandKill(char* args[], int numargs);
-void killProcess(int pid);
+void killProcess(pid_t pid);
 
 #endif /* defined(__UXP_Shell__kill__) */

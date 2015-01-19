@@ -6,6 +6,7 @@
 //
 //
 
+#define _POSIX_SOURCE
 #include "kill.h"
 #include "signal.h"
 #include <stdlib.h>

@@ -18,7 +18,8 @@ listElement* parseCommand(char *command)
   char* args[MAX_ARGS];
   listElement* result;
   int type = COMMAND_NONE;
-  char* strCommand;
+  char* fileName = "";
+  char* strCommand = "";
 
   strCommand = strtok(command, " ");
   if (strcmp(strCommand, "exit") == 0)
@@ -40,14 +41,24 @@ listElement* parseCommand(char *command)
 
   char* token;
   while ((token = strtok(NULL, " ")) && strcmp(token, "|") != 0)
-    args[(argsNum)++] = token;
+  {
+    if (strcmp(token, ">") == 0 || strcmp(token, "<") == 0)
+    {
+      fileName = strtok(NULL, " ");
+      break;
+    }
+    else
+      args[(argsNum)++] = token;
+  }
 
   Command* comm = (Command*) malloc(sizeof(Command));
   comm->type = type;
-  comm->args = args;
+  memcpy(comm->args, args, sizeof(args));
   comm->argsNum = argsNum;
   comm->stringCommand = (char*) malloc(sizeof(strCommand));
   strcpy(comm->stringCommand, strCommand);
+  comm->fileName = (char*) malloc(sizeof(fileName));
+  strcpy(comm->fileName, fileName);
   result = initList(comm);
   return result;
 }

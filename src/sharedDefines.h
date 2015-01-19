@@ -24,6 +24,8 @@ typedef struct Command
   char** args;
   int argsNum;
   char* stringCommand;
+  int flags;
+  char* fileName;
 } Command;
 
 #endif /* defined(__UXP_Shell__sharedDefines__) */

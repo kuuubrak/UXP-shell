@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "../main.h"
+#include "../commands.h"
 
 void handleCommandPwd(char* args[], int numargs);
 void printCurrentDirectory();

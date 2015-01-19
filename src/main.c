@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "list.h"
 #include "sharedDefines.h"
+#include "commands.h"
 
 char *currentDirectory;
 char *username;
@@ -31,7 +32,7 @@ int main ()
 void intialize()
 {
   currentDirectory = getCurrentDirectory();
-  register struct passwd *account;
+  struct passwd *account;
   account = getpwuid(getuid());
   if (account)
     username = account->pw_name;
@@ -59,12 +60,28 @@ void showPrompt()
  */
 void interpretCommand(char *command)
 {
+  // dont parse empty commands
+  if (strlen(command) == 0)
+  {
+    showPrompt();
+    return;
+  }
+
   listElement* commandsList = parseCommand(command);
 
   Command* current;
+  FILE *fp;
   while (commandsList != NULL)
   {
     current = commandsList->command;
+    // redirect command output to file
+    if (strcmp(current->fileName, "") != 0)
+    {
+      fp = fopen(current->fileName, "w");
+      if (fp != NULL)
+        set_output_file(fp);
+      else fprintf(stderr, "Cannot create file: %s", current->fileName);
+    }
     switch (current->type)
     {
       case COMMAND_EXIT:
@@ -92,12 +109,19 @@ void interpretCommand(char *command)
         handleCommandLs(current->args, current->argsNum);
         break;
       default:
-        fprintf(stderr, "Unknown command: %s\n", current->stringCommand);
+        PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;
+    }
+    // set output back to stdout
+    if (strcmp(current->fileName, "") != 0)
+    {
+      set_output_file(stdout);
+      fclose(fp);
     }
     listElement* temp = commandsList;
     commandsList = commandsList->next;
     free(current->stringCommand);
+    free(current->fileName);
     free(current);
     free(temp);
   }
@@ -109,7 +133,7 @@ void interpretCommand(char *command)
  */
 char* getCurrentDirectory()
 {
-  char *directoryBuffer = malloc(128);
-  getcwd(directoryBuffer, 128);
+  char *directoryBuffer = (char*) malloc(256);
+  getcwd(directoryBuffer, 256);
   return directoryBuffer;
 }

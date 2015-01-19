@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
+#include "../commands.h"
 
 void handleCommandLs(char* args[], int numargs)
 {
@@ -25,21 +26,21 @@ void listFiles()
 {
   DIR * currentDirectory;
   char * directoryName = ".";
-  
+
   currentDirectory = opendir(directoryName);
-  
+
   if (!currentDirectory)
   {
     fprintf (stderr, "Cannot open current directory for listing.\n");
   }
-  
+
   while (1) {
     struct dirent *entry;
     entry = readdir (currentDirectory);
     if (!entry) {
       break;
     }
-    printf("%s\n", entry->d_name);
+    PRINT_COMMAND_OUTPUT("%s\n", entry->d_name);
   }
 
   if (closedir (currentDirectory)) {

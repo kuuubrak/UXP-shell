@@ -7,6 +7,9 @@
 //
 
 #include "pwd.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/limits.h>
 
 void handleCommandPwd(char* args[], int numargs)
 {
@@ -19,5 +22,8 @@ void handleCommandPwd(char* args[], int numargs)
  */
 void printCurrentDirectory()
 {
-  printf("%s\n", getCurrentDirectory());
+  char *directoryBuffer = (char*) malloc(PATH_MAX+1);
+  getcwd(directoryBuffer, PATH_MAX+1);
+  PRINT_COMMAND_OUTPUT("%s\n", directoryBuffer);
+  free(directoryBuffer);
 }

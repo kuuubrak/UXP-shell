@@ -5,7 +5,7 @@ Initialize new list.
 */
 listElement* initList(Command* comm)
 {
-  listElement* first = (listElement*) malloc(sizeof(listElement));
+  listElement* first = (listElement*) malloc(sizeof(listElement)+sizeof(Command));
   first->next = NULL;
   first->command = comm;
   return first;
