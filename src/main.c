@@ -7,6 +7,7 @@
 #include "commands/kill.h"
 #include "commands/rm.h"
 #include "commands/ls.h"
+#include "commands/system.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -67,7 +68,11 @@ void interpretCommand(char *command)
     showPrompt();
     return;
   }
+  // save original command
+  char originalCommand[MAX_LINE_SIZE];
+  strcpy(originalCommand, command);
 
+  //strcpy(originalCommand, command);
   listElement* commandsList = parseCommand(command);
 
   Command* current;
@@ -110,7 +115,8 @@ void interpretCommand(char *command)
         handleCommandLs(current->args, current->argsNum);
         break;
       default:
-        PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
+        if (handleSystemCall(originalCommand) != 0) // check if its program
+          PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;
     }
     // set output back to stdout
