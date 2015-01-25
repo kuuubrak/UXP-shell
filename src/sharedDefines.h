@@ -18,6 +18,11 @@ typedef enum CommandType
   COMMAND_MAX_ENUM  = 9
 } CommandType;
 
+enum flags
+{
+  FLAG_IN_BACKGROUND     = 1
+};
+
 typedef struct Command
 {
   CommandType type;

@@ -68,11 +68,7 @@ void interpretCommand(char *command)
     showPrompt();
     return;
   }
-  // save original command
-  char originalCommand[MAX_LINE_SIZE];
-  strcpy(originalCommand, command);
 
-  //strcpy(originalCommand, command);
   listElement* commandsList = parseCommand(command);
 
   Command* current;
@@ -115,7 +111,7 @@ void interpretCommand(char *command)
         handleCommandLs(current->args, current->argsNum);
         break;
       default:
-        if (handleSystemCall(originalCommand) != 0) // check if its program
+        if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags) != 0) // check if its program
           PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;
     }

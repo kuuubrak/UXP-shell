@@ -20,6 +20,7 @@ listElement* parseCommand(char *command)
   int type = COMMAND_NONE;
   char* fileName = "";
   char* strCommand = "";
+  int flags = 0;
 
   strCommand = strtok(command, " ");
   if (strcmp(strCommand, "exit") == 0)
@@ -47,6 +48,8 @@ listElement* parseCommand(char *command)
       fileName = strtok(NULL, " ");
       break;
     }
+    else if (strcmp(token, "&") == 0)
+      flags |= FLAG_IN_BACKGROUND;
     else
       args[(argsNum)++] = token;
   }
@@ -59,6 +62,7 @@ listElement* parseCommand(char *command)
   strcpy(comm->stringCommand, strCommand);
   comm->fileName = (char*) malloc(sizeof(fileName));
   strcpy(comm->fileName, fileName);
+  comm->flags = flags;
   result = initList(comm);
   return result;
 }
