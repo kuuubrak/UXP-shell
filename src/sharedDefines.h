@@ -1,6 +1,8 @@
 #ifndef __UXP_Shell__sharedDefines__
 #define __UXP_Shell__sharedDefines__
 
+#include "redirectList.h"
+
 #define MAX_ARGS 10
 #define MAX_LINE_SIZE 100
 
@@ -30,7 +32,7 @@ typedef struct Command
   int argsNum;
   char* stringCommand;
   int flags;
-  char* fileName;
+  redirect* redirect;
 } Command;
 
 #endif /* defined(__UXP_Shell__sharedDefines__) */

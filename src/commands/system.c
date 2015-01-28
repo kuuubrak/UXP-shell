@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <sys/types.h> 
 #include <sys/wait.h> 
+#include <fcntl.h>
 #include "../sharedDefines.h"
 #include "../pipe.h"
 
-int handleSystemCall(char* comm, char* args[], int numargs, int flags, char* writerPipeName, char* readerPipeName)
+int handleSystemCall(char* comm, char* args[], int numargs, int flags, redirect* redirectList)
 {
   int status;
   char command[MAX_LINE_SIZE];
@@ -28,10 +29,21 @@ int handleSystemCall(char* comm, char* args[], int numargs, int flags, char* wri
   pid_t pid;
   if ((pid = fork()) == 0)
   {
-    if (writerPipeName)
-      freopen(writerPipeName, "w", stdout);
-    if (readerPipeName)
-      freopen(readerPipeName, "r", stdin);
+    while (redirectList)
+    {
+      if (redirectList->fd == 0)
+      {
+        int fd = open(redirectList->filename, O_RDONLY);
+        dup2(fd, redirectList->fd);
+      }
+      else
+      {
+        int fd = open(redirectList->filename, O_WRONLY | O_CREAT);
+        printf(">>>%i<<<: %s\n", redirectList->fd, redirectList->filename);
+        dup2(fd, redirectList->fd);
+      }
+      redirectList = redirectList->next;
+    }
     execvp(comm, execargs);//system(command);
   }
   else

@@ -47,13 +47,37 @@ listElement* parseCommand(char *command)
     else if (strcmp(strCommand, "ls") == 0)
       type = COMMAND_LS;
 
+    redirect* list = NULL;
+
+
     char* token;
     while ((token = strtok(NULL, " ")) && strcmp(token, "|") != 0)
     {
-      if (strcmp(token, ">") == 0 || strcmp(token, "<") == 0)
+      if (strcmp(token, ">") == 0)
       {
         fileName = strtok(NULL, " ");
+        if (!list)
+          list = initRedirectList(1, fileName);
+        else
+          addToRedirectList(list, 1, fileName);
         break;
+      }
+      else if (strcmp(token, "<") == 0)
+      {
+        fileName = strtok(NULL, " ");
+        if (!list)
+          list = initRedirectList(0, fileName);
+        else
+          addToRedirectList(list, 0, fileName);
+      }
+      else if (token[1] == '>')
+      {
+        int fd = token[0] - '0';
+        fileName = strtok(NULL, " ");
+        if (!list)
+          list = initRedirectList(fd, fileName);
+        else
+          addToRedirectList(list, fd, fileName);
       }
       else if (strcmp(token, "&") == 0)
         flags |= FLAG_IN_BACKGROUND;
@@ -68,8 +92,7 @@ listElement* parseCommand(char *command)
     setbuf(stdout, NULL);
     comm->stringCommand = (char*)malloc(strlen(strCommand)+1);
     strcpy(comm->stringCommand, strCommand);
-    comm->fileName = (char*) malloc(sizeof(fileName));
-    strcpy(comm->fileName, fileName);
+    comm->redirect = list;
     comm->flags = flags;
 
     if (result == NULL)

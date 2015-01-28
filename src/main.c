@@ -18,6 +18,7 @@
 #include "commands.h"
 #include <linux/limits.h>
 #include "pipe.h"
+#include "redirectList.h"
 
 char *currentDirectory;
 char *username;
@@ -115,14 +116,13 @@ void interpretCommand(char *command)
 
     current = commandsList->command;
 
-    if (strcmp(current->fileName, "") != 0) // redirect command output to file
+    if (getStdout(current->redirect) && strcmp(getStdout(current->redirect), "") != 0) // redirect command output to file
     {
-      fp = fopen(current->fileName, "w");
+      fp = fopen(getStdout(current->redirect), "w");
       if (fp != NULL)
         set_output_file(fp);
-      else fprintf(stderr, "Cannot create file: %s", current->fileName);
+      else fprintf(stderr, "Cannot create file: %s", getStdout(current->redirect));
     }
-    char* target = NULL;
 
     switch (current->type)
     {
@@ -168,26 +168,38 @@ void interpretCommand(char *command)
         if (writerPipeName)
         {
           current->flags |= FLAG_IN_BACKGROUND; //fork away writer processes
-          target = writerPipeName;
+
+          redirect* r = current->redirect;
+          while (r)
+          {
+            if (r->fd == 1)
+              break;
+            r = r->next;
+          }
+          if (!r)
+          {
+            if(current->redirect)
+              addToRedirectList(current->redirect, 1, writerPipeName);
+            else
+              current->redirect = initRedirectList(1, writerPipeName);
+          }
+          else
+            r->filename = writerPipeName;
         }
-        else if (strcmp(current->fileName, "") != 0)
-        {
-          target = current->fileName;
-        }
-        if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags, target, readerPipeName) != 0) // check if its program
+        if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags, current->redirect) != 0) // check if its program
           PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;
     }
     // set output back to stdout
-    if (strcmp(current->fileName, "") != 0)
+    if (getStdout(current->redirect) && strcmp(getStdout(current->redirect), "") != 0)
     {
       set_output_file(stdout);
-      fclose(fp);
+      if (fp)
+        fclose(fp);
     }
     listElement* temp = commandsList;
     commandsList = commandsList->next;
     free(current->stringCommand);
-    free(current->fileName);
     free(current);
     free(temp);
 
