@@ -46,15 +46,18 @@ void intialize()
  */
 void showPrompt()
 {
-  printf("%s@%s$ ", username, currentDirectory);
-  char commandBuffer[MAX_LINE_SIZE];
-  int size = MAX_LINE_SIZE;
-  if (fgets(commandBuffer, size, stdin) != NULL)
+  while(1)
   {
-    size_t len = strlen(commandBuffer) - 1;
-    if (commandBuffer[len] == '\n')
-      commandBuffer[len] = '\0'; // remove trailing newline character
-    interpretCommand(commandBuffer);
+    printf("%s@%s$ ", username, currentDirectory);
+    char commandBuffer[MAX_LINE_SIZE];
+    int size = MAX_LINE_SIZE;
+    if (fgets(commandBuffer, size, stdin) != NULL)
+    {
+      size_t len = strlen(commandBuffer) - 1;
+      if (commandBuffer[len] == '\n')
+        commandBuffer[len] = '\0'; // remove trailing newline character
+      interpretCommand(commandBuffer);
+    }
   }
 }
 
@@ -81,7 +84,6 @@ void interpretCommand(char *command)
   // dont parse empty commands
   if (strlen(command) == 0)
   {
-    showPrompt();
     return;
   }
 
@@ -206,8 +208,6 @@ void interpretCommand(char *command)
 
     i++;
   }
-
-  showPrompt();
 }
 
 /**
