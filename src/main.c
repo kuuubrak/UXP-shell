@@ -17,6 +17,7 @@
 #include "sharedDefines.h"
 #include "commands.h"
 #include <linux/limits.h>
+#include "pipe.h"
 
 char *currentDirectory;
 char *username;
@@ -58,6 +59,21 @@ void showPrompt()
 }
 
 /**
+ * Updated the current working directory
+ */
+
+void updateCWD()
+{
+  if (currentDirectory)
+    free(currentDirectory);
+
+  long size = pathconf(".", _PC_PATH_MAX);
+
+  if ((currentDirectory = (char*) malloc((size_t) size)) != NULL)
+    currentDirectory = getcwd(currentDirectory, (size_t) size);
+}
+
+/**
  * Interprets entered command, sends it to parser
  */
 void interpretCommand(char *command)
@@ -72,18 +88,40 @@ void interpretCommand(char *command)
   listElement* commandsList = parseCommand(command);
 
   Command* current;
-  FILE *fp;
+  FILE *fp = NULL;
+
+  int i = 0; // number of process in the pipe;
+  int pipeSize = getListSize(commandsList); // size of the pipe
+
+  char *writerPipeName = NULL;
+  char *readerPipeName = NULL;
+
   while (commandsList != NULL)
   {
+    if (i != 0) // if we are reading from a pipe
+    {
+      printf("%s: czytam z pipe'a: %s\n", commandsList->command->stringCommand, readerPipeName);
+    }
+    if (i < pipeSize-1) // if we have at least one more command to execute in the pipe
+    {
+      writerPipeName = malloc(32 * sizeof(char)); // name of the pipe we are writing to
+      createPipe(writerPipeName);
+      printf("%s: pisze do pipe'a: %s\n", commandsList->command->stringCommand, writerPipeName);
+    }
+    else
+      writerPipeName = NULL;
+
     current = commandsList->command;
-    // redirect command output to file
-    if (strcmp(current->fileName, "") != 0)
+
+    if (strcmp(current->fileName, "") != 0) // redirect command output to file
     {
       fp = fopen(current->fileName, "w");
       if (fp != NULL)
         set_output_file(fp);
       else fprintf(stderr, "Cannot create file: %s", current->fileName);
     }
+    char* target = NULL;
+
     switch (current->type)
     {
       case COMMAND_EXIT:
@@ -94,9 +132,16 @@ void interpretCommand(char *command)
         break;
       case COMMAND_CD:
         handleCommandCd(current->args, current->argsNum);
+        updateCWD();
         break;
       case COMMAND_PWD:
-        handleCommandPwd(current->args, current->argsNum);
+      if (writerPipeName && fork() == 0)
+        {
+          openCommandPipe(writerPipeName);
+          handleCommandPwd(current->args, current->argsNum);
+        }
+        else if (!writerPipeName)
+          handleCommandPwd(current->args, current->argsNum);
         break;
       case COMMAND_TOUCH:
         handleCommandTouch(current->args, current->argsNum);
@@ -108,10 +153,26 @@ void interpretCommand(char *command)
         handleCommandRm(current->args, current->argsNum);
         break;
       case COMMAND_LS:
-        handleCommandLs(current->args, current->argsNum);
+        if (writerPipeName && fork() == 0)
+        {
+          openCommandPipe(writerPipeName);
+          handleCommandLs(current->args, current->argsNum);
+          exit(0);
+        }
+        else if (!writerPipeName)
+          handleCommandLs(current->args, current->argsNum);
         break;
       default:
-        if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags) != 0) // check if its program
+        if (writerPipeName)
+        {
+          current->flags |= FLAG_IN_BACKGROUND; //fork away writer processes
+          target = writerPipeName;
+        }
+        else if (strcmp(current->fileName, "") != 0)
+        {
+          target = current->fileName;
+        }
+        if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags, target, readerPipeName) != 0) // check if its program
           PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;
     }
@@ -127,7 +188,25 @@ void interpretCommand(char *command)
     free(current->fileName);
     free(current);
     free(temp);
+
+    if (pipeSize > 1) // these operations are only necessary if we have a pipe
+    {
+      if (i > 0) //if we were reading from a pipe
+      {
+        destroyPipe(readerPipeName);
+      }
+    }
+
+    if (readerPipeName)
+    {
+      free(readerPipeName);
+      readerPipeName = NULL;
+    }
+    readerPipeName = writerPipeName;
+
+    i++;
   }
+
   showPrompt();
 }
 

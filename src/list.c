@@ -25,3 +25,14 @@ void addElementToList(listElement *list, Command *comm)
   newElement->next = NULL;
   temp->next = newElement;
 }
+
+unsigned int getListSize(listElement *list)
+{
+  unsigned int i = 0;
+  while (list)
+  {
+    ++i;
+    list = list->next;
+  }
+  return i;
+}

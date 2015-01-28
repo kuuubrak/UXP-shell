@@ -26,7 +26,7 @@ enum flags
 typedef struct Command
 {
   CommandType type;
-  char** args;
+  char* args[MAX_ARGS];
   int argsNum;
   char* stringCommand;
   int flags;

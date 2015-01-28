@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -std=c99
+CFLAGS = -Wall -std=c99 -g
 SOURCES = $(wildcard src/*.c) $(wildcard src/commands/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 EXEC = uxp-shell

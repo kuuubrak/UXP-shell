@@ -3,35 +3,44 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/types.h> 
+#include <sys/wait.h> 
 #include "../sharedDefines.h"
+#include "../pipe.h"
 
-int handleSystemCall(char* comm, char* args[], int numargs, int flags)
+int handleSystemCall(char* comm, char* args[], int numargs, int flags, char* writerPipeName, char* readerPipeName)
 {
   int status;
   char command[MAX_LINE_SIZE];
   memset(command, 0, MAX_LINE_SIZE);
 
-  strcat(command, comm);
-  strcat(command, " ");
+  char** execargs = (char**) malloc(sizeof(char*) * (numargs + 2)); // +1 for null-terminate, +1 for program name
 
-  for (int i = 0; i < numargs; ++i)
+  for (int i = 1; i <= numargs; ++i)
   {
-
-    strcat(command, args[i]);
-    strcat(command, " ");
+    execargs[i] = (char*) malloc(strlen(args[i-1])+1);
+    strcpy(execargs[i], args[i-1]);
   }
 
-  if (flags & FLAG_IN_BACKGROUND)
+  execargs[numargs+1] = 0;
+  execargs[0] = comm;
+
+  pid_t pid;
+  if ((pid = fork()) == 0)
   {
-    if (fork() == 0)
-    {
-      status = system(command);
-      exit(0);
-    }
-    else status = 0; // @todo wait for child result?
+    if (writerPipeName)
+      freopen(writerPipeName, "w", stdout);
+    if (readerPipeName)
+      freopen(readerPipeName, "r", stdin);
+    execvp(comm, execargs);//system(command);
   }
   else
-    status = system(command);
-
-  return status;
+  {
+    if (!(flags & FLAG_IN_BACKGROUND))
+    {
+      waitpid(pid, &status, 0);
+      return WEXITSTATUS(status);
+    }
+  }
+  return 0;
 }

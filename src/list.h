@@ -13,5 +13,6 @@ typedef struct listElement
 
 listElement* initList(Command* comm);
 void addElementToList(listElement *list, Command *comm);
+unsigned int getListSize(listElement *list);
 
 #endif /* defined(__UXP_Shell__list__) */
