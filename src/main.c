@@ -188,6 +188,30 @@ void interpretCommand(char *command)
           else
             r->filename = writerPipeName;
         }
+        if (readerPipeName)
+        {
+          redirect* r = current->redirect;
+          while (r)
+          {
+            if (r->fd == 0)
+              break;
+            r = r->next;
+          }
+          if (!r)
+          {
+            if(current->redirect)
+              addToRedirectList(current->redirect, 0, readerPipeName);
+            else
+              current->redirect = initRedirectList(0, readerPipeName);
+          }
+          else
+            r->filename = readerPipeName;
+        }
+        redirect* r = current->redirect;
+        while(r)
+        {
+          r = r->next;
+        }
         if (handleSystemCall(current->stringCommand, current->args, current->argsNum, current->flags, current->redirect) != 0) // check if its program
           PRINT_COMMAND_OUTPUT("Unknown command: %s\n", current->stringCommand);
         break;

@@ -121,13 +121,24 @@ listElement* parseCommand(char *command)
           args[(argsNum)++] = token;
         else
         {
-          char* token2 = strtok(NULL, "'");
-          char* result = (char*) malloc(strlen(token) + strlen(token2) + 1);
-          strcpy(result, token+1);
-          strcat(result, " ");
-          strcat(result, token2);
+          char* token2;
+          char* result;
+          if(token[strlen(token)-1] != '\'')
+          {
+            token2 = strtok(NULL, "'");
+            result = (char*) malloc(strlen(token) + strlen(token2) + 1);
+            strcpy(result, token+1);
+            strcat(result, " ");
+            strcat(result, token2);
+          }
+          else
+          {
+            result = (char*) malloc(strlen(token)+1);
+            strcpy(result, token+1);
+            result[strlen(result)-1]='\0';
+          }
 
-          args[(argsNum)++] = token;
+          args[(argsNum)++] = result;
         }
     }
 
