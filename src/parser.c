@@ -82,7 +82,18 @@ listElement* parseCommand(char *command)
       else if (strcmp(token, "&") == 0)
         flags |= FLAG_IN_BACKGROUND;
       else
-        args[(argsNum)++] = token;
+        if (token[0] != '\'')
+          args[(argsNum)++] = token;
+        else
+        {
+          char* token2 = strtok(NULL, "'");
+          char* result = (char*) malloc(strlen(token) + strlen(token2) + 1);
+          strcpy(result, token+1);
+          strcat(result, " ");
+          strcat(result, token2);
+          
+          args[(argsNum)++] = token;
+        }
     }
 
     Command* comm = (Command*) malloc(sizeof(Command));
