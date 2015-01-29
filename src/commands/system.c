@@ -11,7 +11,7 @@
 
 int handleSystemCall(char* comm, char* args[], int numargs, int flags, redirect* redirectList)
 {
-  int status;
+  int status = 0;
   char command[MAX_LINE_SIZE];
   memset(command, 0, MAX_LINE_SIZE);
 
@@ -43,7 +43,7 @@ int handleSystemCall(char* comm, char* args[], int numargs, int flags, redirect*
       }
       redirectList = redirectList->next;
     }
-    execvp(comm, execargs);//system(command);
+    status = execvp(comm, execargs);//system(command);
   }
   else
   {
@@ -53,5 +53,5 @@ int handleSystemCall(char* comm, char* args[], int numargs, int flags, redirect*
       return WEXITSTATUS(status);
     }
   }
-  return 0;
+  return status;
 }
