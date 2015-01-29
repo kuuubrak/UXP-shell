@@ -23,6 +23,8 @@
 char *currentDirectory;
 char *username;
 
+extern int subshell;
+
 int main ()
 {
   intialize();
@@ -220,6 +222,8 @@ void interpretCommand(char *command)
 
     i++;
   }
+  if (subshell == 1)
+    exit(0);
 }
 
 /**

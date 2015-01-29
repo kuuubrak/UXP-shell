@@ -39,7 +39,6 @@ int handleSystemCall(char* comm, char* args[], int numargs, int flags, redirect*
       else
       {
         int fd = open(redirectList->filename, O_WRONLY | O_CREAT);
-        printf(">>>%i<<<: %s\n", redirectList->fd, redirectList->filename);
         dup2(fd, redirectList->fd);
       }
       redirectList = redirectList->next;

@@ -8,15 +8,53 @@
 
 #include "parser.h"
 #include <string.h>
+#include <stdlib.h>
+#include <sys/types.h> 
+#include <sys/wait.h> 
+#include <fcntl.h>
+#include <unistd.h>
+#include "main.h"
 
+int subshell;
 /**
 Parse command, save type in type, arguments in args and number of arguments in argsNum. Returns list of commands.
 */
 listElement* parseCommand(char *command)
 {
   listElement* result = NULL;
+  redirect* list = NULL;
   short repeat = 0;
+  subshell = 0;
 
+  if (*command == '(')
+  {
+    command[strlen(command)-1] = '\0';
+    command++;
+    if (fork() != 0)
+    {
+      wait(NULL);
+      return NULL;
+    }
+    else
+      subshell = 1;
+  }
+  else if (*command == '`')
+  {
+    command[strlen(command)-1] = '\0';
+    command++;
+    list = initRedirectList(1, "/tmp/uxpcmd");
+    if (fork() != 0)
+    {
+      wait(NULL);
+      char string[128];
+      FILE* f = fopen("/tmp/uxpcmd", "r");
+      while(fgets(string, 128, f) != NULL)      
+        interpretCommand(string);
+      return NULL;
+    }
+    else
+      subshell = 1;
+  }
   do {
     int argsNum = 0;
     char* args[MAX_ARGS];
@@ -46,9 +84,6 @@ listElement* parseCommand(char *command)
       type = COMMAND_RM;
     else if (strcmp(strCommand, "ls") == 0)
       type = COMMAND_LS;
-
-    redirect* list = NULL;
-
 
     char* token;
     while ((token = strtok(NULL, " ")) && strcmp(token, "|") != 0)
@@ -91,7 +126,7 @@ listElement* parseCommand(char *command)
           strcpy(result, token+1);
           strcat(result, " ");
           strcat(result, token2);
-          
+
           args[(argsNum)++] = token;
         }
     }
